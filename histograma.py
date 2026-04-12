@@ -1,13 +1,12 @@
-import cv2
 import numpy as np
-import matplotlib.pyplot as plt
+
 
 def histograma(img):
-    
     histogram = np.zeros(256)
-    x, y = img.shape
-    for i in range(x):
-        for j in range(y):
+    x_size, y_size = img.shape
+
+    for i in range(x_size):
+        for j in range(y_size):
             histogram[img[i, j]] += 1
-            
+
     return histogram
