@@ -6,8 +6,8 @@ from skimage.util import random_noise
 from grayscale import grayscale
 from histograma import histograma
 
-
-def load_and_prepare_images():
+# Carrega e altera tamanho da imagem para 256x256
+def load_images():
     img_blood = cv2.imread("Images/imagem_Blood.png")
     img_blood = cv2.resize(img_blood, (256, 256))
 
@@ -19,13 +19,13 @@ def load_and_prepare_images():
 
     return img_blood, img_path, img_retina
 
-
-def add_salt_and_pepper_noise(image):
+# Adiciona ruído na imagem
+def add_noise(image):
     noisy_image = random_noise(image / 255, mode="s&p")
     noisy_image = noisy_image * 255
     return np.array(noisy_image, dtype=np.uint8)
 
-
+# Cria histograma da imagem
 def plot_histogram(image):
     histogram = histograma(image)
     x = np.linspace(0, 255, 256)
@@ -36,17 +36,19 @@ def plot_histogram(image):
 
 
 def main():
-    img_blood, img_path, img_retina = load_and_prepare_images()
+    img_blood, img_path, img_retina = load_images()
 
     img_grayscale_blood = grayscale(img_blood)
     img_grayscale_path = grayscale(img_path)
     img_grayscale_retina = grayscale(img_retina)
 
-    img_blood_ruido = add_salt_and_pepper_noise(img_grayscale_blood)
-    add_salt_and_pepper_noise(img_grayscale_path)
-    add_salt_and_pepper_noise(img_grayscale_retina)
+    img_blood_ruido = add_noise(img_grayscale_blood)
+    img_path_ruido = add_noise(img_grayscale_path)
+    img_retina_ruido = add_noise(img_grayscale_retina)
 
     plot_histogram(img_blood_ruido)
+    plot_histogram(img_path_ruido)
+    plot_histogram(img_retina_ruido)
 
 
 if __name__ == "__main__":
