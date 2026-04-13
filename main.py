@@ -6,6 +6,7 @@ from skimage.util import random_noise
 from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
 from histograma import histograma, histogram_equalized, img_equalized
+from metrics import print_pipeline_metrics
 from unsharp_highboost import highboostFilter, unsharpMask
 from sobel import sobel
 
@@ -46,17 +47,48 @@ def process_image(image):
     equalized_image = img_equalized(histogram_equalized(histograma(median_image), median_image), median_image)
     sobel_image = sobel(equalized_image)
     unsharp_image = unsharpMask(sobel_image)
-    highboost_image =highboostFilter(unsharp_image)
+    highboost_image = highboostFilter(sobel_image)
 
-    return grayscale_image, noisy_image, median_image, equalized_image, sobel_image, highboost_image
+    return grayscale_image, noisy_image, median_image, equalized_image, sobel_image, unsharp_image, highboost_image
 
 
 def main():
     img_blood, img_path, img_retina = load_images()
 
-    img_grayscale_blood, img_blood_ruido, img_blood_mediana, img_blood_equalized, img_blood_sobel, img_blood_final = process_image(img_blood)
-    img_grayscale_path, img_path_ruido, img_path_mediana, img_path_equalized, img_path_sobel, img_path_final = process_image(img_path)
-    img_grayscale_retina, img_retina_ruido, img_retina_mediana, img_retina_equalized, img_retina_sobel, img_retina_final = process_image(img_retina)
+    img_grayscale_blood, img_blood_ruido, img_blood_mediana, img_blood_equalized, img_blood_sobel, img_blood_unsharp, img_blood_final = process_image(img_blood)
+    img_grayscale_path, img_path_ruido, img_path_mediana, img_path_equalized, img_path_sobel, img_path_unsharp, img_path_final = process_image(img_path)
+    img_grayscale_retina, img_retina_ruido, img_retina_mediana, img_retina_equalized, img_retina_sobel, img_retina_unsharp, img_retina_final = process_image(img_retina)
+
+    print_pipeline_metrics(
+        "Blood",
+        img_grayscale_blood,
+        img_blood_ruido,
+        img_blood_mediana,
+        img_blood_equalized,
+        img_blood_sobel,
+        img_blood_unsharp,
+        img_blood_final,
+    )
+    print_pipeline_metrics(
+        "Path",
+        img_grayscale_path,
+        img_path_ruido,
+        img_path_mediana,
+        img_path_equalized,
+        img_path_sobel,
+        img_path_unsharp,
+        img_path_final,
+    )
+    print_pipeline_metrics(
+        "Retina",
+        img_grayscale_retina,
+        img_retina_ruido,
+        img_retina_mediana,
+        img_retina_equalized,
+        img_retina_sobel,
+        img_retina_unsharp,
+        img_retina_final,
+    )
 
     """
     plot_histogram(img_grayscale_blood)
@@ -69,9 +101,9 @@ def main():
     """
 
     cv2.imshow("imgRuido", img_blood_ruido)
-    cv2.imshow("equalizada", blood_equalized)
-    cv2.imshow("unsharp", blood_unsharp)
-    cv2.imshow("highboost", blood_highboost)
+    cv2.imshow("equalizada", img_blood_equalized)
+    cv2.imshow("unsharp", img_blood_unsharp)
+    cv2.imshow("highboost", img_blood_final)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 

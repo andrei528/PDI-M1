@@ -13,8 +13,8 @@ def sobel(img):
                         [-2, 0, 2],
                         [-1, 0, 1] ])
 
-    gx = conv2d(img, kernelGx)
-    gy = conv2d(img, kernelGy)
+    gx = conv2d(img, kernelGx, clip=False)
+    gy = conv2d(img, kernelGy, clip=False)
 
     imgH, imgW = img.shape
 
@@ -33,9 +33,11 @@ def sobel(img):
         output = (output / max_val) * 255
         
     output = np.array(output, dtype=np.float32) + np.array(img, dtype=np.float32)
-    for i in range(256):
-        for j in range(256):
+    for i in range(imgH):
+        for j in range(imgW):
             if output[i, j] > 255:
                 output[i, j] = 255
+            elif output[i, j] < 0:
+                output[i, j] = 0
 
     return np.array(output, dtype=np.uint8)
