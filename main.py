@@ -4,6 +4,7 @@ import numpy as np
 from skimage.util import random_noise
 
 from conv2d_mediana import conv2d_mediana
+from gamma import gamma_correction
 from grayscale import grayscale
 from histograma import histograma, histogram_equalized, img_equalized
 from metrics import print_pipeline_metrics
@@ -44,10 +45,11 @@ def process_image(image):
     grayscale_image = grayscale(image)
     noisy_image = add_noise(grayscale_image)
     median_image = conv2d_mediana(noisy_image, 3, 3)
-    equalized_image = img_equalized(histogram_equalized(histograma(median_image), median_image), median_image)
+    gamma_image = gamma_correction(median_image)
+    equalized_image = img_equalized(histogram_equalized(histograma(gamma_image), gamma_image), gamma_image)
+    unsharp_image = unsharpMask(equalized_image)
+    highboost_image = highboostFilter(equalized_image)
     sobel_image = sobel(equalized_image)
-    unsharp_image = unsharpMask(sobel_image)
-    highboost_image = highboostFilter(sobel_image)
 
     return grayscale_image, noisy_image, median_image, equalized_image, sobel_image, unsharp_image, highboost_image
 
@@ -100,10 +102,13 @@ def main():
     plot_histogram(img_retina_mediana)
     """
 
+    cv2.imshow("grayscale", img_grayscale_blood)
     cv2.imshow("imgRuido", img_blood_ruido)
+    cv2.imshow("mediana", img_blood_mediana)
     cv2.imshow("equalizada", img_blood_equalized)
     cv2.imshow("unsharp", img_blood_unsharp)
     cv2.imshow("highboost", img_blood_final)
+    cv2.imshow("sobel", img_blood_sobel)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
