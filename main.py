@@ -3,6 +3,7 @@ import matplotlib.pyplot as plt
 import numpy as np
 from skimage.util import random_noise
 
+from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
 from histograma import histograma
 
@@ -34,7 +35,6 @@ def plot_histogram(image):
     plt.ylabel("frequência")
     plt.show()
 
-
 def main():
     img_blood, img_path, img_retina = load_images()
 
@@ -46,10 +46,29 @@ def main():
     img_path_ruido = add_noise(img_grayscale_path)
     img_retina_ruido = add_noise(img_grayscale_retina)
 
-    plot_histogram(img_blood_ruido)
-    plot_histogram(img_path_ruido)
-    plot_histogram(img_retina_ruido)
+    img_blood_mediana = conv2d_mediana(img_blood_ruido, 3, 3)
+    img_path_mediana = conv2d_mediana(img_path_ruido, 3, 3)
+    img_retina_mediana = conv2d_mediana(img_retina_ruido, 3, 3)
+    
+    '''plot_histogram(img_grayscale_blood)
+    plot_histogram(img_grayscale_path)
+    plot_histogram(img_grayscale_retina)'''
 
+    '''plot_histogram(img_blood_mediana)
+    plot_histogram(img_path_mediana)
+    plot_histogram(img_retina_mediana) '''
+
+    cv2.imshow('in', img_blood_mediana)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    cv2.imshow('in', img_path_mediana)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+
+    cv2.imshow('in', img_retina_mediana)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
 
 if __name__ == "__main__":
     main()
