@@ -92,14 +92,7 @@ def test_highboost_clips_values_above_255():
 
 
 def test_metrics_prints_psnr_and_ssim(capsys):
-    image = np.array(
-        [
-            [10, 20, 30],
-            [40, 50, 60],
-            [70, 80, 90],
-        ],
-        dtype=np.uint8,
-    )
+    image = np.arange(49, dtype=np.uint8).reshape(7, 7)
 
     result = calculate_metrics(image, image)
     captured = capsys.readouterr()
