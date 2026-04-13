@@ -56,7 +56,7 @@ def main():
 
     blood_equalized = img_equalized(histogram_equalized(histograma(img_blood_mediana), img_blood_mediana), img_blood_mediana)
     blood_unsharp = unsharpMask(blood_equalized)
-    blood_highboost = highboostFilter(blood_equalized)
+    blood_highboost = highboostFilter(blood_unsharp)
 
     """
     plot_histogram(img_grayscale_blood)
