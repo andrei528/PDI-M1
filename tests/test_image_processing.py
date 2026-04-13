@@ -6,7 +6,7 @@ from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
 from histograma import histograma
 from metrics import calculate_metrics
-from unsharp_highboost import highboostFilter, unsharpMask
+from unsharp_highboost import highBoost
 
 
 def test_grayscale_returns_channel_average():
@@ -42,7 +42,7 @@ def test_main_module_can_be_imported_without_running_plot():
     assert callable(module.main)
 
 
-def test_unsharp_and_highboost_use_median_filtered_image():
+def test_median_filter_reduces_center_impulse():
     image = np.array(
         [
             [10, 10, 10],
@@ -52,18 +52,46 @@ def test_unsharp_and_highboost_use_median_filtered_image():
         dtype=np.uint8,
     )
 
-    median_image = conv2d_mediana(image, 3, 3)
-    unsharp_image = unsharpMask(image)
-    highboost_image = highboostFilter(image)
+    result = conv2d_mediana(image, 3, 3)
 
-    assert unsharp_image.shape == image.shape
-    assert highboost_image.shape == image.shape
-    assert median_image[1, 1] == 10
-    assert unsharp_image[1, 1] == 190
-    assert highboost_image[1, 1] == 255
+    assert result.shape == image.shape
+    assert result[1, 1] == 10
 
 
-def test_metrics_return_psnr_and_ssim():
+def test_highboost_combines_input_with_edge_image():
+    image = np.array(
+        [
+            [10, 10, 10],
+            [10, 100, 10],
+            [10, 10, 10],
+        ],
+        dtype=np.uint8,
+    )
+    edge_image = np.array(
+        [
+            [0, 0, 0],
+            [0, 90, 0],
+            [0, 0, 0],
+        ],
+        dtype=np.uint8,
+    )
+
+    result = highBoost(image, 1, edge_image)
+
+    assert result.shape == image.shape
+    assert result[1, 1] == 190
+
+
+def test_highboost_clips_values_above_255():
+    image = np.array([[100]], dtype=np.uint8)
+    edge_image = np.array([[90]], dtype=np.uint8)
+
+    result = highBoost(image, 2, edge_image)
+
+    assert result[0, 0] == 255
+
+
+def test_metrics_prints_psnr_and_ssim(capsys):
     image = np.array(
         [
             [10, 20, 30],
@@ -74,8 +102,8 @@ def test_metrics_return_psnr_and_ssim():
     )
 
     result = calculate_metrics(image, image)
+    captured = capsys.readouterr()
 
-    assert "psnr" in result
-    assert "ssim" in result
-    assert np.isinf(result["psnr"])
-    assert result["ssim"] == 1.0
+    assert result is None
+    assert "PSNR:" in captured.out
+    assert "SSIM:" in captured.out
