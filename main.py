@@ -4,7 +4,7 @@ import numpy as np
 from skimage.util import random_noise
 
 from grayscale import grayscale
-from histograma import histograma
+from histograma import histograma, histogram_equalized, img_equalized
 
 # Carrega e altera tamanho da imagem para 256x256
 def load_images():
@@ -28,12 +28,21 @@ def add_noise(image):
 # Cria histograma da imagem
 def plot_histogram(image):
     histogram = histograma(image)
-    x = np.linspace(0, 255, 256)
-    plt.bar(x, histogram)
-    plt.xlabel("intensidade")
-    plt.ylabel("frequência")
-    plt.show()
-
+    #x = np.linspace(0, 255, 256)
+    #plt.bar(x, histogram)
+    #plt.xlabel("intensidade")
+    #plt.ylabel("frequência")
+    #plt.show()
+    
+    histogram = histogram_equalized(histogram, image)
+    
+    #plt.bar(x, histogram)
+    #plt.xlabel("intensidade")
+    #plt.ylabel("frequência")
+    #plt.show()
+    img_eq = img_equalized( histogram, image)
+    
+    return img_eq
 
 def main():
     img_blood, img_path, img_retina = load_images()
@@ -46,10 +55,16 @@ def main():
     img_path_ruido = add_noise(img_grayscale_path)
     img_retina_ruido = add_noise(img_grayscale_retina)
 
-    plot_histogram(img_blood_ruido)
-    plot_histogram(img_path_ruido)
-    plot_histogram(img_retina_ruido)
-
+    img_equalized = plot_histogram(img_blood_ruido)
+    
+    cv2.imshow('bloodEqualized', img_equalized)
+    cv2.imshow('blood', img_blood_ruido)
+    cv2.waitKey(0)
+    cv2.destroyAllWindows()
+    #plot_histogram(img_path_ruido)
+    #plot_histogram(img_retina_ruido)
+    
+    
 
 if __name__ == "__main__":
     main()
