@@ -5,7 +5,7 @@ from skimage.util import random_noise
 
 from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
-from histograma import histograma
+from histograma import histograma, histogram_equalized, img_equalized
 
 # Carrega e altera tamanho da imagem para 256x256
 def load_images():
