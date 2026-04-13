@@ -6,8 +6,9 @@ from skimage.util import random_noise
 from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
 from histograma import histograma, histogram_equalized, img_equalized
+from unsharp_highboost import highboostFilter, unsharpMask
 
-# Carrega e altera tamanho da imagem para 256x256
+
 def load_images():
     img_blood = cv2.imread("Images/imagem_Blood.png")
     img_blood = cv2.resize(img_blood, (256, 256))
@@ -20,62 +21,70 @@ def load_images():
 
     return img_blood, img_path, img_retina
 
-# Adiciona ruído na imagem
+
 def add_noise(image):
     noisy_image = random_noise(image / 255, mode="s&p")
     noisy_image = noisy_image * 255
     return np.array(noisy_image, dtype=np.uint8)
 
-# Cria histograma da imagem
+
 def plot_histogram(image):
     histogram = histograma(image)
     x = np.linspace(0, 255, 256)
     plt.bar(x, histogram)
     plt.xlabel("intensidade")
-    plt.ylabel("frequência")
+    plt.ylabel("frequencia")
     plt.show()
-    
+
     return histogram
+
+
+def process_image(image):
+    grayscale_image = grayscale(image)
+    noisy_image = add_noise(grayscale_image)
+    median_image = conv2d_mediana(noisy_image, 3, 3)
+
+    return grayscale_image, noisy_image, median_image
+
 
 def main():
     img_blood, img_path, img_retina = load_images()
 
-    img_grayscale_blood = grayscale(img_blood)
-    img_grayscale_path = grayscale(img_path)
-    img_grayscale_retina = grayscale(img_retina)
+    img_grayscale_blood, img_blood_ruido, img_blood_mediana = process_image(img_blood)
+    img_grayscale_path, img_path_ruido, img_path_mediana = process_image(img_path)
+    img_grayscale_retina, img_retina_ruido, img_retina_mediana = process_image(img_retina)
 
-    img_blood_ruido = add_noise(img_grayscale_blood)
-    img_path_ruido = add_noise(img_grayscale_path)
-    img_retina_ruido = add_noise(img_grayscale_retina)
-
-    img_blood_mediana = conv2d_mediana(img_blood_ruido, 3, 3)
-    img_path_mediana = conv2d_mediana(img_path_ruido, 3, 3)
-    img_retina_mediana = conv2d_mediana(img_retina_ruido, 3, 3)
-    
     blood_equalized = img_equalized(histogram_equalized(histograma(img_blood_mediana), img_blood_mediana), img_blood_mediana)
-    
-    '''
+    blood_unsharp = unsharpMask(blood_equalized)
+    blood_highboost = highboostFilter(blood_equalized)
+
+    """
     plot_histogram(img_grayscale_blood)
     plot_histogram(img_grayscale_path)
     plot_histogram(img_grayscale_retina)
 
     plot_histogram(img_blood_mediana)
     plot_histogram(img_path_mediana)
-    plot_histogram(img_retina_mediana)'''
-    
-    
-    cv2.imshow('imgRuido', img_blood_ruido)
-    cv2.imshow('in', blood_equalized)
+    plot_histogram(img_retina_mediana)
+    """
+
+    cv2.imshow("imgRuido", img_blood_ruido)
+    cv2.imshow("equalizada", blood_equalized)
+    cv2.imshow("unsharp", blood_unsharp)
+    cv2.imshow("highboost", blood_highboost)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    '''cv2.imshow('in', img_path_mediana)
+    """
+    cv2.imshow("in", img_path_mediana)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    cv2.imshow('in', img_retina_mediana)
+    cv2.imshow("in", img_retina_mediana)
     cv2.waitKey(0)
-    cv2.destroyAllWindows()'''
+    cv2.destroyAllWindows()
+    """
+
 
 if __name__ == "__main__":
     main()
