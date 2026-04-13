@@ -1,7 +1,6 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
-from skimage.util import random_noise
 
 from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
@@ -11,20 +10,34 @@ from sobel import sobel
 
 def load_images():
     img_blood = cv2.imread("Images/imagem_Blood.png")
+    if img_blood is None:
+        raise FileNotFoundError("Nao foi possivel carregar Images/imagem_Blood.png")
     img_blood = cv2.resize(img_blood, (256, 256))
 
     img_path = cv2.imread("Images/imagem_Path.png")
+    if img_path is None:
+        raise FileNotFoundError("Nao foi possivel carregar Images/imagem_Path.png")
     img_path = cv2.resize(img_path, (256, 256))
 
     img_retina = cv2.imread("Images/imagem_Retina.png")
+    if img_retina is None:
+        raise FileNotFoundError("Nao foi possivel carregar Images/imagem_Retina.png")
     img_retina = cv2.resize(img_retina, (256, 256))
 
     return img_blood, img_path, img_retina
 
 
-def add_noise(image):
-    noisy_image = random_noise(image / 255, mode="s&p")
-    noisy_image = noisy_image * 255
+def add_noise(image, amount=0.05, salt_vs_pepper=0.5):
+    noisy_image = np.array(image, copy=True)
+    rng = np.random.default_rng()
+    random_values = rng.random(image.shape)
+
+    salt_limit = amount * salt_vs_pepper
+    pepper_limit = amount
+
+    noisy_image[random_values < salt_limit] = 255
+    noisy_image[(random_values >= salt_limit) & (random_values < pepper_limit)] = 0
+
     return np.array(noisy_image, dtype=np.uint8)
 
 
@@ -48,15 +61,15 @@ def process_image(image):
     unsharp_image = unsharpMask(sobel_image)
     highboost_image =highboostFilter(unsharp_image)
 
-    return grayscale_image, noisy_image, median_image, equalized_image, sobel_image, highboost_image
+    return grayscale_image, noisy_image, median_image, equalized_image, sobel_image, unsharp_image, highboost_image
 
 
 def main():
     img_blood, img_path, img_retina = load_images()
 
-    img_grayscale_blood, img_blood_ruido, img_blood_mediana, img_blood_equalized, img_blood_sobel, img_blood_final = process_image(img_blood)
-    img_grayscale_path, img_path_ruido, img_path_mediana, img_path_equalized, img_path_sobel, img_path_final = process_image(img_path)
-    img_grayscale_retina, img_retina_ruido, img_retina_mediana, img_retina_equalized, img_retina_sobel, img_retina_final = process_image(img_retina)
+    img_grayscale_blood, img_blood_ruido, img_blood_mediana, img_blood_equalized, img_blood_sobel, img_blood_unsharp, img_blood_highboost = process_image(img_blood)
+    img_grayscale_path, img_path_ruido, img_path_mediana, img_path_equalized, img_path_sobel, img_path_unsharp, img_path_highboost = process_image(img_path)
+    img_grayscale_retina, img_retina_ruido, img_retina_mediana, img_retina_equalized, img_retina_sobel, img_retina_unsharp, img_retina_highboost = process_image(img_retina)
 
     """
     plot_histogram(img_grayscale_blood)
@@ -69,9 +82,10 @@ def main():
     """
 
     cv2.imshow("imgRuido", img_blood_ruido)
-    cv2.imshow("equalizada", blood_equalized)
-    cv2.imshow("unsharp", blood_unsharp)
-    cv2.imshow("highboost", blood_highboost)
+    cv2.imshow("equalizada", img_blood_equalized)
+    cv2.imshow("sobel", img_blood_sobel)
+    cv2.imshow("unsharp", img_blood_unsharp)
+    cv2.imshow("highboost", img_blood_highboost)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 

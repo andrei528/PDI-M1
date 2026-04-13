@@ -5,6 +5,7 @@ import numpy as np
 from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
 from histograma import histograma
+from main import add_noise
 from unsharp_highboost import highboostFilter, unsharpMask
 
 
@@ -39,6 +40,17 @@ def test_main_module_can_be_imported_without_running_plot():
     module = importlib.import_module("main")
 
     assert callable(module.main)
+
+
+def test_add_noise_preserves_shape_dtype_and_range():
+    image = np.full((8, 8), 127, dtype=np.uint8)
+
+    result = add_noise(image, amount=0.2)
+
+    assert result.shape == image.shape
+    assert result.dtype == np.uint8
+    assert result.min() >= 0
+    assert result.max() <= 255
 
 
 def test_unsharp_and_highboost_use_median_filtered_image():
