@@ -34,6 +34,8 @@ def plot_histogram(image):
     plt.xlabel("intensidade")
     plt.ylabel("frequência")
     plt.show()
+    
+    return histogram
 
 def main():
     img_blood, img_path, img_retina = load_images()
@@ -50,25 +52,30 @@ def main():
     img_path_mediana = conv2d_mediana(img_path_ruido, 3, 3)
     img_retina_mediana = conv2d_mediana(img_retina_ruido, 3, 3)
     
-    '''plot_histogram(img_grayscale_blood)
+    blood_equalized = img_equalized(histogram_equalized(histograma(img_blood_mediana), img_blood_mediana), img_blood_mediana)
+    
+    '''
+    plot_histogram(img_grayscale_blood)
     plot_histogram(img_grayscale_path)
-    plot_histogram(img_grayscale_retina)'''
+    plot_histogram(img_grayscale_retina)
 
-    '''plot_histogram(img_blood_mediana)
+    plot_histogram(img_blood_mediana)
     plot_histogram(img_path_mediana)
-    plot_histogram(img_retina_mediana) '''
-
-    cv2.imshow('in', img_blood_mediana)
+    plot_histogram(img_retina_mediana)'''
+    
+    
+    cv2.imshow('imgRuido', img_blood_ruido)
+    cv2.imshow('in', blood_equalized)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
-    cv2.imshow('in', img_path_mediana)
+    '''cv2.imshow('in', img_path_mediana)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
     cv2.imshow('in', img_retina_mediana)
     cv2.waitKey(0)
-    cv2.destroyAllWindows()
+    cv2.destroyAllWindows()'''
 
 if __name__ == "__main__":
     main()
