@@ -1,6 +1,7 @@
 import cv2
 import matplotlib.pyplot as plt
 import numpy as np
+from skimage.util import random_noise
 
 from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
@@ -28,16 +29,13 @@ def load_images():
 
 
 def add_noise(image, amount=0.05, salt_vs_pepper=0.5):
-    noisy_image = np.array(image, copy=True)
-    rng = np.random.default_rng()
-    random_values = rng.random(image.shape)
-
-    salt_limit = amount * salt_vs_pepper
-    pepper_limit = amount
-
-    noisy_image[random_values < salt_limit] = 255
-    noisy_image[(random_values >= salt_limit) & (random_values < pepper_limit)] = 0
-
+    noisy_image = random_noise(
+        image / 255,
+        mode="s&p",
+        amount=amount,
+        salt_vs_pepper=salt_vs_pepper,
+    )
+    noisy_image = noisy_image * 255
     return np.array(noisy_image, dtype=np.uint8)
 
 
