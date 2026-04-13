@@ -29,11 +29,11 @@ def conv2d(img, kernel, padding=True):
         for k in range(k_height):
           for l in range(k_width):
             soma += padded_img[i+k, j+l] * kernel[k, l]
-
+            
         if soma > 255:
           soma = 255
         if soma < 0:
           soma = 0
         output[i, j] = soma
-
+        
     return np.array(output, dtype=np.uint8)
