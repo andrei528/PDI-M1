@@ -1,12 +1,41 @@
 import numpy as np
 
-from padding import prepare_convolution
+
+def add_padding(img, padding_height, padding_width):
+    n, m = img.shape
+    padded_img = np.zeros((n + padding_height * 2, m + padding_width * 2))
+    padded_img[
+        padding_height : n + padding_height, padding_width : m + padding_width
+    ] = img
+
+    return padded_img
 
 
 def conv2d(img, kernel, padding=True):
-    k_height, k_width = kernel.shape
-    padded_img, output, img_height, img_width = prepare_convolution(img, k_height, k_width, padding)
+    # Get dimensions of the kernel
+    k_height, k_width = kernel.shape  # Atribui valor à variável k_height, k_width
 
+    # Get dimensions of the image
+    img_height, img_width = img.shape  # Atribui valor à variável img_height, img_width
+
+    # Calculate padding required
+    pad_height = k_height // 2  # Atribui valor à variável pad_height
+    pad_width = k_width // 2  # Atribui valor à variável pad_width
+
+    # Create a padded version of the image to handle edges
+    if padding == True:
+        padded_img = add_padding(
+            img, pad_height, pad_width
+        )  # Atribui valor à variável padded_img
+
+    # print(padded_img)
+
+    # Initialize an output image with zeros
+    output = np.zeros(
+        (img_height, img_width), dtype=float
+    )  # Atribui valor à variável output
+
+    # Perform convolution
     for i in range(img_height):
         for j in range(img_width):
             soma = 0

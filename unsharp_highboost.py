@@ -1,28 +1,20 @@
 import numpy as np
 
-from conv2d_mediana import conv2d_mediana
+from gaussian_filter import gauss_create
+from conv2d import conv2d
 
-def unsharpMask(img, kernel=None, k=1, sigma=1, size_x=3, size_y=3):
-    img_uint8 = np.array(img, dtype=np.uint8)
-    img_float = np.array(img, dtype=np.float32)
-    img_blur = np.array(conv2d_mediana(img_uint8, size_x, size_y, True), dtype=np.float32)
 
-    img_height, img_width = img_float.shape
-    output = np.zeros((img_height, img_width), dtype=np.uint8)
+def highBoost(img, k, imgSobel):
 
-    for i in range(img_height):
-        for j in range(img_width):
-            mask = img_float[i, j] - img_blur[i, j]
-            pixel = img_float[i, j] + (k * mask)
+    img = np.array(img, dtype=np.float32)
+    output = img + (k * imgSobel)
 
-            if pixel > 255:
-                pixel = 255
-            elif pixel < 0:
-                pixel = 0
+    imgH, imgW = img.shape
+    for i in range(imgH):
+        for j in range(imgW):
+            if output[i, j] > 255:
+                output[i, j] = 255
+            elif output[i, j] < 0:
+                output[i, j] = 0
 
-            output[i, j] = int(pixel)
-
-    return output
-
-def highboostFilter(img, kernel=None, k=2, sigma=1, size_x=3, size_y=3):
-    return unsharpMask(img, kernel=kernel, k=k, sigma=sigma, size_x=size_x, size_y=size_y)
+    return np.array(output, dtype=np.uint8)

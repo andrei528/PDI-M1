@@ -5,6 +5,7 @@ import numpy as np
 from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
 from histograma import histograma
+from metrics import calculate_metrics
 from unsharp_highboost import highboostFilter, unsharpMask
 
 
@@ -60,3 +61,21 @@ def test_unsharp_and_highboost_use_median_filtered_image():
     assert median_image[1, 1] == 10
     assert unsharp_image[1, 1] == 190
     assert highboost_image[1, 1] == 255
+
+
+def test_metrics_return_psnr_and_ssim():
+    image = np.array(
+        [
+            [10, 20, 30],
+            [40, 50, 60],
+            [70, 80, 90],
+        ],
+        dtype=np.uint8,
+    )
+
+    result = calculate_metrics(image, image)
+
+    assert "psnr" in result
+    assert "ssim" in result
+    assert np.isinf(result["psnr"])
+    assert result["ssim"] == 1.0
