@@ -7,7 +7,7 @@ from conv2d_mediana import conv2d_mediana
 from grayscale import grayscale
 from histograma import histograma, histogram_equalized, img_equalized
 from unsharp_highboost import highboostFilter, unsharpMask
-
+from sobel import sobel
 
 def load_images():
     img_blood = cv2.imread("Images/imagem_Blood.png")
@@ -43,20 +43,20 @@ def process_image(image):
     grayscale_image = grayscale(image)
     noisy_image = add_noise(grayscale_image)
     median_image = conv2d_mediana(noisy_image, 3, 3)
+    equalized_image = img_equalized(histogram_equalized(histograma(median_image), median_image), median_image)
+    sobel_image = sobel(equalized_image)
+    unsharp_image = unsharpMask(sobel_image)
+    highboost_image =highboostFilter(unsharp_image)
 
-    return grayscale_image, noisy_image, median_image
+    return grayscale_image, noisy_image, median_image, equalized_image, sobel_image, highboost_image
 
 
 def main():
     img_blood, img_path, img_retina = load_images()
 
-    img_grayscale_blood, img_blood_ruido, img_blood_mediana = process_image(img_blood)
-    img_grayscale_path, img_path_ruido, img_path_mediana = process_image(img_path)
-    img_grayscale_retina, img_retina_ruido, img_retina_mediana = process_image(img_retina)
-
-    blood_equalized = img_equalized(histogram_equalized(histograma(img_blood_mediana), img_blood_mediana), img_blood_mediana)
-    blood_unsharp = unsharpMask(blood_equalized)
-    blood_highboost = highboostFilter(blood_unsharp)
+    img_grayscale_blood, img_blood_ruido, img_blood_mediana, img_blood_equalized, img_blood_sobel, img_blood_final = process_image(img_blood)
+    img_grayscale_path, img_path_ruido, img_path_mediana, img_path_equalized, img_path_sobel, img_path_final = process_image(img_path)
+    img_grayscale_retina, img_retina_ruido, img_retina_mediana, img_retina_equalized, img_retina_sobel, img_retina_final = process_image(img_retina)
 
     """
     plot_histogram(img_grayscale_blood)
