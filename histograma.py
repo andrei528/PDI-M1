@@ -1,6 +1,5 @@
 import numpy as np
 
-
 def histograma(img):
     histogram = np.zeros(256)
     x_size, y_size = img.shape
