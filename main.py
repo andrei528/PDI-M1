@@ -33,7 +33,7 @@ def plot_histogram(image):
     x = np.linspace(0, 255, 256)
     plt.bar(x, histogram)
     plt.xlabel("intensidade")
-    plt.ylabel("frequencia")
+    plt.ylabel("frequência")
     plt.show()
 
     return histogram
